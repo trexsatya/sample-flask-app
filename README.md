@@ -1,14 +1,9 @@
 # sample-flask-project
 
-1. [Install PyCharm](https://www.jetbrains.com/pycharm/download/)
-   and create a new project.<br>
-   ![Add New](./documentation/resources/images/new_project_with_virtualenv.png)
-   (You can always view/change python interpreter later if you want, Press double shift key, enter `python interpreter` to open `Preferences > Project Interpreter` window.)
-
-2. Open terminal in the PyCharm itself (Press 'Alt+F12' keys)
-    You'll see (venv) on the terminal before your username, which means that you will now be running commands within Virtual Environment created earlier.
-   ![Terminal](./documentation/resources/images/terminal_in_pycharm.png)
-   (Note: using external terminal would be more cumbersome)
-3. Create requirements files, and sample test file.
-4. Install packages/libraries by running command `pip install -r requirements/development.txt` on terminal.
-5. Run `pytest` command on terminal.
+1. Create `app/controllers` package, and `user_controller.py` to contain controller code
+2. Move `create_app` method from `conftest.py` to `app/main.py`
+3. Make sure that you have `__init__.py` in tests folder and app folder.
+   (This becomes a bit tricky if you were developing a python library. See here: https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)
+   <br> But we are creating an application, so it seems fine.
+4. Run `pytest`, your tests should pass, which means we have a functioning REST API for users.
+5. `jsonify` is a useful helper method, see its documentation. You could simply return (data, response_code) from the controller
