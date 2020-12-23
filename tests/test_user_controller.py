@@ -1,3 +1,6 @@
+from sqlalchemy.orm import class_mapper
+
+from app.entities.user import User
 
 
 class TestUserController:
@@ -23,8 +26,11 @@ class TestUserController:
         response = testapp.post_json("/api/v1/users", {"name": "1234", "email": "invalid_mail"}, status="*")
         assert response.status_code == 400
 
-    def test_that_we_can_create_new_user(self, testapp):
+    def test_that_we_can_create_new_user(self, testapp, db):
         response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
         assert response.status_code == 200
-        print(response)
         assert response.json["name"] == "ivhas"
+
+    def test_that_user_is_saved_to_database_after_creation(self, testapp, db):
+        response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
+        assert len(db.session.query(User).all()) == 1

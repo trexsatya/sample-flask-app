@@ -2,7 +2,8 @@ from flask import jsonify, Blueprint, request
 from flask.views import MethodView
 from flask_apispec import marshal_with
 
-from app.dto.user import UserSchema
+from app.dto.user import UserSchema, UserData
+from app.entities.user import User
 from app.utils import validate_with
 
 FAKE_DATA = [{"user_id": 1, "value": "duck"}, {"user_id": 2, "value": "cat"}]
@@ -22,7 +23,8 @@ class UserController(MethodView):
     @marshal_with(user_schema)
     def post(self):
         validate_with(user_schema)
-        user_data = user_schema.load(request.get_json())
+        user_data: UserData = user_schema.load(request.get_json())
+        User(name=user_data.name, email=user_data.email).save()
         return user_data
 
 
