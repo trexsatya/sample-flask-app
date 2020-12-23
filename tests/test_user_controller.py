@@ -9,3 +9,22 @@ class TestUserController:
         response = testapp.get("/api/v1/users/1", status="*")
         assert response is not None
         assert response.status_code == 200
+
+    def test_that_invalid_data_is_not_allowed_in_creation(self, testapp):
+        # Invalid name: number instead of string
+        response = testapp.post_json("/api/v1/users", {"name": 1231, "email": "abc@mail.com"}, status="*")
+        assert response.status_code == 400
+
+        # Too long name
+        response = testapp.post_json("/api/v1/users", {"name": "1234567891011", "email": "abc@mail.com"}, status="*")
+        assert response.status_code == 400
+
+        # Invalid email
+        response = testapp.post_json("/api/v1/users", {"name": "1234", "email": "invalid_mail"}, status="*")
+        assert response.status_code == 400
+
+    def test_that_we_can_create_new_user(self, testapp):
+        response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
+        assert response.status_code == 200
+        print(response)
+        assert response.json["name"] == "ivhas"
