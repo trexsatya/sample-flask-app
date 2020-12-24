@@ -1,9 +1,11 @@
 from flask import jsonify, Blueprint, request
 from flask.views import MethodView
 from flask_apispec import marshal_with
+from injector import inject
 
 from app.dto.user import UserSchema, UserData
 from app.entities.user import User
+from app.services.user import UserService
 from app.utils import validate_with
 
 FAKE_DATA = [{"user_id": 1, "value": "duck"}, {"user_id": 2, "value": "cat"}]
@@ -14,6 +16,10 @@ user_schema = UserSchema()
 
 
 class UserController(MethodView):
+    @inject
+    def __init__(self, user_service: UserService):
+        self.user_service = user_service
+
     def get(self, user_id):
         if user_id is None:
             return jsonify(FAKE_DATA)
@@ -24,8 +30,8 @@ class UserController(MethodView):
     def post(self):
         validate_with(user_schema)
         user_data: UserData = user_schema.load(request.get_json())
-        User(name=user_data.name, email=user_data.email).save()
-        return user_data
+        user = self.user_service.create_user(user_data)
+        return UserData.build_from(user)
 
 
 user_view = UserController.as_view("api")

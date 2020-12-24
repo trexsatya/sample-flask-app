@@ -12,3 +12,4 @@ def validate_with(schema: Schema):
         print("Validation failed", errors)
         resp = make_response(jsonify(errors), 400)
         abort(resp)
+

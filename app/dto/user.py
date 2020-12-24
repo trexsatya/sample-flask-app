@@ -1,15 +1,26 @@
+from typing import Optional
+
 from marshmallow import post_load, fields, Schema, validates, ValidationError
 import datetime as dt
+
+from app.entities.user import User
 
 
 class UserData:
     def __init__(self, name, email):
+        self.id: Optional[int] = None
         self.name = name
         self.email = email
         self.created_at = dt.datetime.now()
 
     def __repr__(self):
         return "<User(name={self.name!r})>".format(self=self)
+
+    @staticmethod
+    def build_from(user: User):
+        data = UserData(user.name, user.email)
+        data.id = user.id
+        return data
 
 
 class UserSchema(Schema):

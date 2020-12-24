@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy, Model
 import datetime as dt
 
+from zope.sqlalchemy import register
+
 
 class CRUDMixin(Model):
     """Mixin that adds convenience methods for CRUD (Create, Read, Update, Delete) operations"""
@@ -29,4 +31,5 @@ class CRUDMixin(Model):
         return commit and database.session.commit()
 
 
-database = SQLAlchemy(model_class=CRUDMixin)
+database = SQLAlchemy(model_class=CRUDMixin, session_options={"expire_on_commit": False})
+register(database.session)

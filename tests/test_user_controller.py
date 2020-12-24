@@ -1,6 +1,8 @@
+from _pytest import monkeypatch
 from sqlalchemy.orm import class_mapper
 
 from app.entities.user import User
+from app.services.user import ExternalService
 
 
 class TestUserController:
@@ -34,3 +36,10 @@ class TestUserController:
     def test_that_user_is_saved_to_database_after_creation(self, testapp, db):
         response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
         assert len(db.session.query(User).all()) == 1
+
+    def test_that_user_is_not_saved_to_database_if_transaction_fails(self, testapp, db, monkeypatch):
+        def mock_call():
+            raise Exception("Unknown")
+        monkeypatch.setattr(ExternalService, "call", mock_call)
+        response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
+        assert len(db.session.query(User).all()) == 0, "Shouldn't have been saved!"
