@@ -1,6 +1,8 @@
 # sample-flask-project
 
-1. Here we have used FlaskSQLAlchemy library for using Database.
-As of now we are using in-memory database only for tests, but things won't change much when we use real/persistent database.
+1. Here we have added Dependency Injection framework (similar to [Guice](https://github.com/google/guice) framework),
+<br>
+   We have also added transaction support. (Actually for simple cases, we need not transaction library because we could have done `database.session.revert()` instead of `transaction.abort()` in our error handler)
+   
    
    
