@@ -1,3 +1,4 @@
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy, Model
 import datetime as dt
 
@@ -33,3 +34,4 @@ class CRUDMixin(Model):
 
 database = SQLAlchemy(model_class=CRUDMixin, session_options={"expire_on_commit": False})
 register(database.session)
+migrate = Migrate()

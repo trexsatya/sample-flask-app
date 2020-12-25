@@ -6,14 +6,14 @@ from app.services.user import ExternalService
 
 
 class TestUserController:
-    def test_that_application_handles_user_request(self, testapp):
+    def test_that_application_handles_user_request(self, testapp, db):
         response = testapp.get("/api/v1/users", status="*")
         assert response is not None
-        assert response.status_code == 200
+        assert response.status_code == 404
 
         response = testapp.get("/api/v1/users/1", status="*")
         assert response is not None
-        assert response.status_code == 200
+        assert response.status_code == 404
 
     def test_that_invalid_data_is_not_allowed_in_creation(self, testapp):
         # Invalid name: number instead of string
@@ -35,11 +35,25 @@ class TestUserController:
 
     def test_that_user_is_saved_to_database_after_creation(self, testapp, db):
         response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
-        assert len(db.session.query(User).all()) == 1
+        assert len(User.find_all()) == 1
 
     def test_that_user_is_not_saved_to_database_if_transaction_fails(self, testapp, db, monkeypatch):
         def mock_call():
             raise Exception("Unknown")
         monkeypatch.setattr(ExternalService, "call", mock_call)
         response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
-        assert len(db.session.query(User).all()) == 0, "Shouldn't have been saved!"
+        assert len(User.find_all()) == 0, "Shouldn't have been saved!"
+
+    def test_that_we_can_retrieve_the_user_created(self, testapp, db):
+        response = testapp.post_json("/api/v1/users", {"name": "ivhas", "email": "abc@mail.com"}, status="*")
+        response = testapp.get("/api/v1/users", status="*")
+        assert response.status_code == 200
+
+        # Id=1 is automatically assigned while creating user in database; this autoincrement feature
+        # is not available in all databases
+        response = testapp.get(f"/api/v1/users/{1}", status="*")
+        assert response.status_code == 200
+
+        response = testapp.post_json("/api/v1/users", {"name": "another", "email": "xyz@mail.com"}, status="*")
+        response = testapp.get(f"/api/v1/users/{2}", status="*")
+        assert response.status_code == 200

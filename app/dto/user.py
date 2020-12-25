@@ -11,15 +11,17 @@ class UserData:
         self.id: Optional[int] = None
         self.name = name
         self.email = email
-        self.created_at = dt.datetime.now()
 
     def __repr__(self):
         return "<User(name={self.name!r})>".format(self=self)
 
     @staticmethod
     def build_from(user: User):
+        if not user:
+            return UserData(None, None)
         data = UserData(user.name, user.email)
         data.id = user.id
+        data.created_at = user.created_at
         return data
 
 

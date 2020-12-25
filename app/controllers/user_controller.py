@@ -5,12 +5,12 @@ from injector import inject
 
 from app.dto.user import UserSchema, UserData
 from app.entities.user import User
+from app.extensions import database
 from app.services.user import UserService
-from app.utils import validate_with
-
-FAKE_DATA = [{"user_id": 1, "value": "duck"}, {"user_id": 2, "value": "cat"}]
+from app.utils import validate_with, ensure_resource_present
 
 user_blueprint = Blueprint("users_api", __name__)
+
 
 user_schema = UserSchema()
 
@@ -20,13 +20,19 @@ class UserController(MethodView):
     def __init__(self, user_service: UserService):
         self.user_service = user_service
 
+    @marshal_with(UserSchema(many=True))
     def get(self, user_id):
-        if user_id is None:
-            return jsonify(FAKE_DATA)
+        if user_id is not None:
+            user = User.find_first(id=user_id)
+            ensure_resource_present(user)
+            return [UserData.build_from(user)]
         else:
-            return jsonify(list(filter(lambda x: x['user_id'] == user_id, FAKE_DATA)))
+            users = User.find_all()
+            ensure_resource_present(users)
+            print("users", )
+            return list(map(lambda x: UserData.build_from(x), users))
 
-    @marshal_with(user_schema)
+    @marshal_with(UserSchema(many=False))
     def post(self):
         validate_with(user_schema)
         user_data: UserData = user_schema.load(request.get_json())
