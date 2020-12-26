@@ -1,22 +1,22 @@
 # sample-flask-project
 
-Here we have created `autoapp.py` which will serve as entrypoint for Flask app Framework.
+Here we have used `Flask-HTTPAuth` library to implement JWT token based authentication system.
+The authentication is customized social login (only google supported as of now), which works like this:-
+1. You get access token from google (This can be easily done by integrating google on UI side)
+2. The access token can be sent to our app to register, or login to the application.
+
+Our app verifies the token and then creates its own token to return to the user upon login.
+
+-------
+
+UserController tests have been accordingly modified to pass authentication header.
 <br>
-Also, we have created some config classes for Dev and Prod.
-For now, we'll use in-memory DB even in prod environment. 
-We have `.env` file containing environment variables, we need `python-dotenv` library to use this file.
+There are few small changes in `user` table as well. Remember that after you make any changes in the table/entity models, 
+you have to run `flask db migrate` and `flask db upgrade` commands to apply the changes to the database.
 
-Next, we have `Dockerfile` containing commands on how to create docker image.
-The base image is chosen as per suggestions from this post (https://pythonspeed.com/articles/base-image-python-docker-images/)
-<br>You can try different images, if you want.
+--------
+Here're some useful commands for manual testing:-<br>
+Get the idToken from google. and run `export G_TOKEN=<paste_token_value_here>`
+1. curl -X POST -d "{ \"idToken\": \"$G_TOKEN\" , \"social\": \"google\" }" http://127.0.0.1:5000/api/v1/auth/login -H "Content-Type: application/json"
+2. curl -H "Authorization: Bearer $token" http://127.0.0.1:5000/api/v1/users
 
-We have also used flask-migrate framework to support database migration (creating, updating tables in the database).
-
-We have also created a `docker-compose.yml` file to run MySQL image and build our app (you can build docker image of our app using docker build command as well).
-
-Note: Remember to use ` --no-cache` option along with build command when docker starts using cache while running the command (it will inform you on terminal).
-
-You'll also notice the changes in `user_controller.py` file: we have used database now instead of fake data.
-
-Also, there's `static_controller.py` added, this can be used to serve static files from our app, for now it is just for `favicon.ico` which is automatically requested when you open the URL in browser.
-The URL for opening the app in the browser will be printed on the terminal when you run the app.
