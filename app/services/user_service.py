@@ -19,7 +19,8 @@ class UserService:
 
     def create_user(self, user_data: UserData):
         transaction.begin()
-        user = User(name=user_data.name, email=user_data.email).save(commit=False)
+        user = User(name=user_data.name, email=user_data.email,
+                    email_verified=user_data.email_verified).save(commit=False)
         self.external_service.call()
         transaction.commit()
 

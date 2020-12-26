@@ -1,8 +1,11 @@
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy, Model
 import datetime as dt
-
 from zope.sqlalchemy import register
+from flask_httpauth import HTTPTokenAuth
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
+# from app.services.auth_service import AuthService
 
 
 class CRUDMixin(Model):
@@ -35,3 +38,5 @@ class CRUDMixin(Model):
 database = SQLAlchemy(model_class=CRUDMixin, session_options={"expire_on_commit": False})
 register(database.session)
 migrate = Migrate()
+auth = HTTPTokenAuth('Bearer')
+

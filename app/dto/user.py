@@ -7,10 +7,12 @@ from app.entities.user import User
 
 
 class UserData:
-    def __init__(self, name, email):
+    def __init__(self, name, email, email_verified=None, social_login=None):
         self.id: Optional[int] = None
         self.name = name
         self.email = email
+        self.email_verified: Optional[bool] = email_verified
+        self.social_login: Optional[str] = social_login
 
     def __repr__(self):
         return "<User(name={self.name!r})>".format(self=self)
